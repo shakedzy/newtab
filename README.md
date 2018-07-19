@@ -2,17 +2,10 @@
 
 ![screenshot](desc/screenshot.png)
 
-## Installation:
-* Extract all files to any directory
-* In Chrome, go to [`chrome://extensions`](chrome://extensions)
-* Enable _Developer Mode_
-* Click _Load Unpacked_ and choose the directory you placed the files in
+**Note:** The script used requires Python 3.x
 
 ## Creating custom tabs:
 Follow the instructions below and use the `create.py` script.
-
-
-**Note:** The script used requires Python 3.x
 
 ### Configuring links:
 Two CSV files are used required (you can also have just one): `chips.csv` and 
@@ -51,3 +44,11 @@ cd ~/newtab
 python3 create.py
 ``` 
 There's no need to reinstall the extension.
+
+
+## Installation:
+Chrome installation is only possible after `create.py` was used.
+* Extract all files to any directory
+* In Chrome, go to [`chrome://extensions`](chrome://extensions)
+* Enable _Developer Mode_
+* Click _Load Unpacked_ and choose the directory you placed the files in
