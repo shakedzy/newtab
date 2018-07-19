@@ -227,6 +227,6 @@ if __name__ == '__main__':
         f.write(css)
     with open('newtab.html','w') as f:
         f.write(html_start)
-        add_objects_to_file(f,'chips.csv',8,html_chip)
+        add_objects_to_file(f,'chips.csv',6,html_chip)
         add_objects_to_file(f,'cards.csv',4,html_card)
         f.write(html_end)
