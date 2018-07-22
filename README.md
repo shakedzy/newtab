@@ -2,10 +2,17 @@
 
 ![screenshot](desc/screenshot.png)
 
-**Note:** The script used requires Python 3.x
+## Installation:
+* Extract all files to any directory
+* In Chrome, go to [`chrome://extensions`](chrome://extensions)
+* Enable _Developer Mode_
+* Click _Load Unpacked_ and choose the directory you placed the files in
 
 ## Creating custom tabs:
 Follow the instructions below and use the `create.py` script.
+
+
+**Note:** The script used requires Python 3.x
 
 ### Configuring links:
 Two CSV files are used required (you can also have just one): `chips.csv` and 
@@ -18,6 +25,17 @@ HBO,http://www.hbo.com
 Netflix,http://www.netflix.com
 ``` 
 
+### Additional drop-down links:
+It is possible to add additional links to each card as a drop-down menu.
+To do so, simply add more `name,url` tuples in each line. For example:
+``` 
+HBO,http://www.hbo.com
+Netflix,http://www.netflix.com,Netflix Originals,https://www.netflix.com/il-en/originals
+```
+For example, the image below has 3 additional links added to Jenkins:
+
+![dropdown_example](desc/dropdown.png)
+
 ### Configuring images:
 The script automatically look for an image named `img/[name].png`, where `[name]`
 is the name defined in the CSV file (lowered-case and with no spaces, so for `HBO`
@@ -27,7 +45,7 @@ Chips, and a colored square with the first letter will be used for Cards (see th
 rightmost card on the second row in the screen-shot).
 
 **Defining alternative images:** You can specify an alternative image file instead
-of the one looked for by default. To do so, add the image file-name as a third
+of the one looked for by default. To do so, add the image file-name as the _last_
 column in the CSV file. For example, to define an alternative image for `Netflix`:
 ``` 
 HBO,http://www.hbo.com
@@ -44,11 +62,3 @@ cd ~/newtab
 python3 create.py
 ``` 
 There's no need to reinstall the extension.
-
-
-## Installation:
-Chrome installation is only possible after `create.py` was used.
-* Extract all files to any directory
-* In Chrome, go to [`chrome://extensions`](chrome://extensions)
-* Enable _Developer Mode_
-* Click _Load Unpacked_ and choose the directory you placed the files in

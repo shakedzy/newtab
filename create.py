@@ -3,22 +3,22 @@ import csv
 import os.path
 
 manifest = """{
-	"name": "Taboola New Tab",
-	"version": "1.0",
-	"description": "Taboola New Tab",
-	"manifest_version": 2,
-	"short_name": "New Tab",
-	"chrome_url_overrides": {
-	 	"newtab": "newtab.html"
-	},
-	"icons": { 
-		"16": "img/icon16.png",
+  "name": "Taboola New Tab",
+  "version": "1.0",
+  "description": "Taboola New Tab",
+  "manifest_version": 2,
+  "short_name": "New Tab",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "icons": { 
+    "16": "img/icon16.png",
         "48": "img/icon48.png",
         "128": "img/icon128.png" 
-	},
-	"browser_action": {
-    	"default_icon": "img/icon32.png"
-  	}
+  },
+  "browser_action": {
+      "default_icon": "img/icon32.png"
+    }
 }
 """
 
@@ -36,6 +36,7 @@ css = """div.wall {
   height: 90%;
   display: inline-block;
   margin: 20px;
+  position: relative;
 }
 
 .card:hover {
@@ -49,6 +50,15 @@ css = """div.wall {
   height: 100%;
   max-height: 100px;
   padding-bottom: 5px;
+  position: relative;
+}
+
+.cardbg {
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  top: 0px; 
+  left: 0px;
 }
 
 .cardletter {
@@ -60,11 +70,47 @@ css = """div.wall {
   color: white;
 }
 
+.dropdown {
+  position: absolute; 
+  right: 0px; 
+  top: 0px;
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropdownarrow  {
+  background-color: #96ffcc;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content-item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
 .container {
   padding-top: 5px;
   padding-bottom: 5px;
   background: #eeeeee;
   height: 100%;
+  position: relative;
 }
 
 .chip {
@@ -170,7 +216,7 @@ def get_image_name(name,alt_image):
         return None
 
 
-def html_chip(chip_name,url,image_name):
+def html_chip(chip_name,url,image_name,**kwargs):
     if image_name is None or not image_name:
         img = ''
     else:
@@ -178,18 +224,26 @@ def html_chip(chip_name,url,image_name):
     return """<div class="chip"><a href="{url}">{img}{chip_name}</a></div>""".format(chip_name=chip_name,url=url,img=img)
 
 
-def html_card(card_name,url,image_name):
+def html_card(card_name,url,image_name,**kwargs):
     if image_name is None:
         img_html = """<div class="cardletter" style="background-color: {color}; ">{letter}</div><div style="height: 10px"></div>""".format(letter=card_name[0].upper(),color=random_color())
     else:
         img_html = """<img src="{image_name}" class="cardimg">""".format(image_name=image_name)
-    return """<a href="{url}">
-    <div class="card">
-      {img_html}
+    dropdown = kwargs.get('dropdown',list())
+    if dropdown is None or not dropdown:
+        dropdown_html = ''
+    else:
+        dropdown_html = """\n<div class="dropdown"><img src="img/dropdown.png" class="dropdownarrow"><div class="dropdown-content">"""
+        for item in dropdown:
+            dropdown_html += """\n<a class="dropdown-content-item" href="{url}">{name}</a>""".format(name=item[0],url=item[1])
+        dropdown_html += """\n</div></div>"""
+    return """<div class="card">
+      {dropdown_html}
+      <a href="{url}"><img src="img/blank.png" class="cardbg">{img_html}
       <div class="container" align="center">
         {card_name} 
-      </div>
-    </div></a>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url)
+      </div></a>
+    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url,dropdown_html=dropdown_html)
 
 
 def add_objects_to_file(file,csv_name,row_length,html_func):
@@ -198,16 +252,21 @@ def add_objects_to_file(file,csv_name,row_length,html_func):
             reader = csv.reader(csvf)
             i = 0
             for row in reader:
+                dropdown = list()
                 i = i + 1
                 if len(row) < 2:
                     raise RuntimeError('CSV file must contain at lease two columns!')
-                elif len(row) == 2:
+                if len(row) % 2 == 0:
                     alt_img = None
+                    l = len(row)
                 else:
-                    alt_img = row[2]
+                    alt_img = row[-1]
+                    l = len(row) - 1
+                for n in range(2,l,2):
+                    dropdown.append((row[n], row[n+1]))
                 name = row[0]
                 image_name = get_image_name(name, alt_img)
-                file.write(html_func(name, row[1], image_name))
+                file.write(html_func(name, row[1], image_name, dropdown=dropdown))
                 if i % row_length == 0 and i > 0:
                     file.write('<br>')
             if csv_name == 'cards.csv' and i % row_length != 0:
@@ -227,6 +286,6 @@ if __name__ == '__main__':
         f.write(css)
     with open('newtab.html','w') as f:
         f.write(html_start)
-        add_objects_to_file(f,'chips.csv',8,html_chip)
+        add_objects_to_file(f,'chips.csv',6,html_chip)
         add_objects_to_file(f,'cards.csv',4,html_card)
         f.write(html_end)
