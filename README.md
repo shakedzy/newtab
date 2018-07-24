@@ -32,7 +32,7 @@ To do so, simply add more `name,url` tuples in each line. For example:
 HBO,http://www.hbo.com
 Netflix,http://www.netflix.com,Netflix Originals,https://www.netflix.com/il-en/originals
 ```
-For example, the image below has 3 additional links added to Jenkins:
+This second row will create the following card:
 
 ![dropdown_example](desc/dropdown.png)
 

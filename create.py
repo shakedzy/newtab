@@ -221,7 +221,7 @@ def html_chip(chip_name,url,image_name,**kwargs):
         img = ''
     else:
         img =  """<img src="{image_name}">""".format(image_name=image_name)
-    return """<div class="chip"><a href="{url}">{img}{chip_name}</a></div>""".format(chip_name=chip_name,url=url,img=img)
+    return """<a href="{url}"><div class="chip">{img}{chip_name}</div></a>""".format(chip_name=chip_name,url=url,img=img)
 
 
 def html_card(card_name,url,image_name,**kwargs):
@@ -237,13 +237,13 @@ def html_card(card_name,url,image_name,**kwargs):
         for item in dropdown:
             dropdown_html += """\n<a class="dropdown-content-item" href="{url}">{name}</a>""".format(name=item[0],url=item[1])
         dropdown_html += """\n</div></div>"""
-    return """<div class="card">
+    return """<div class="card" style="z-index: {z_index};">
       {dropdown_html}
       <a href="{url}"><img src="img/blank.png" class="cardbg">{img_html}
       <div class="container" align="center">
         {card_name} 
       </div></a>
-    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url,dropdown_html=dropdown_html)
+    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url,dropdown_html=dropdown_html,z_index=100-kwargs['i'])
 
 
 def add_objects_to_file(file,csv_name,row_length,html_func):
@@ -266,7 +266,7 @@ def add_objects_to_file(file,csv_name,row_length,html_func):
                     dropdown.append((row[n], row[n+1]))
                 name = row[0]
                 image_name = get_image_name(name, alt_img)
-                file.write(html_func(name, row[1], image_name, dropdown=dropdown))
+                file.write(html_func(name, row[1], image_name, dropdown=dropdown, i=i))
                 if i % row_length == 0 and i > 0:
                     file.write('<br>')
             if csv_name == 'cards.csv' and i % row_length != 0:
