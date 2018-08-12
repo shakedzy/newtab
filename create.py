@@ -229,6 +229,10 @@ def html_card(card_name,url,image_name,**kwargs):
         img_html = """<div class="cardletter" style="background-color: {color}; ">{letter}</div><div style="height: 10px"></div>""".format(letter=card_name[0].upper(),color=random_color())
     else:
         img_html = """<img src="{image_name}" class="cardimg">""".format(image_name=image_name)
+    if 'i' in kwargs.keys():
+        z_index = 100-kwargs['i']
+    else:
+        z_index = 0
     dropdown = kwargs.get('dropdown',list())
     if dropdown is None or not dropdown:
         dropdown_html = ''
@@ -243,7 +247,7 @@ def html_card(card_name,url,image_name,**kwargs):
       <div class="container" align="center">
         {card_name} 
       </div></a>
-    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url,dropdown_html=dropdown_html,z_index=100-kwargs['i'])
+    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url,dropdown_html=dropdown_html,z_index=z_index)
 
 
 def add_objects_to_file(file,csv_name,row_length,html_func):
