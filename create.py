@@ -225,6 +225,11 @@ def html_chip(chip_name,url,image_name,**kwargs):
 
 
 def html_card(card_name,url,image_name,**kwargs):
+    if card_name is None:
+        card_name = '&nbsp;'
+        container_additional = 'style="background-color: transparent;"'
+    else:
+        container_additional = ''
     if image_name is None:
         img_html = """<div class="cardletter" style="background-color: {color}; ">{letter}</div><div style="height: 10px"></div>""".format(letter=card_name[0].upper(),color=random_color())
     else:
@@ -233,7 +238,11 @@ def html_card(card_name,url,image_name,**kwargs):
         z_index = 100-kwargs['i']
     else:
         z_index = 0
-    dropdown = kwargs.get('dropdown',list())
+    if url is None:
+        href = ''
+    else:
+        href = 'href="{url}"'.format(url=url)
+    dropdown = kwargs.get('dropdown', list())
     if dropdown is None or not dropdown:
         dropdown_html = ''
     else:
@@ -243,11 +252,12 @@ def html_card(card_name,url,image_name,**kwargs):
         dropdown_html += """\n</div></div>"""
     return """<div class="card" style="z-index: {z_index};">
       {dropdown_html}
-      <a href="{url}"><img src="img/blank.png" class="cardbg">{img_html}
-      <div class="container" align="center">
+      <a {href}><img src="img/blank.png" class="cardbg" >{img_html}
+      <div class="container" align="center" {container_additional}>
         {card_name} 
       </div></a>
-    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,url=url,dropdown_html=dropdown_html,z_index=z_index)
+    </div>""".format(card_name=card_name,image_name=image_name,img_html=img_html,href=href,
+                     dropdown_html=dropdown_html,z_index=z_index,container_additional=container_additional)
 
 
 def add_objects_to_file(file,csv_name,row_length,html_func):
@@ -276,7 +286,7 @@ def add_objects_to_file(file,csv_name,row_length,html_func):
             if csv_name == 'cards.csv' and i % row_length != 0:
                 while i % row_length != 0:
                     i = i + 1
-                    file.write(html_func('&nbsp;','','img/blank.png'))
+                    file.write(html_func(None, None, 'img/blank.png'))
                 file.write('<br>')
             if not (i - 1) % row_length == 0:
                 file.write('<br>')
