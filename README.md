@@ -26,7 +26,7 @@ Netflix,http://www.netflix.com
 ``` 
 
 ### Additional drop-down links:
-It is possible to add additional links to each card as a drop-down menu.
+It is possible to add additional links to cards and chips as a drop-down menu.
 To do so, simply add more `name,url` tuples in each line. For example:
 ``` 
 HBO,http://www.hbo.com

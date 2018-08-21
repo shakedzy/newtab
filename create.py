@@ -3,22 +3,22 @@ import csv
 import os.path
 
 manifest = """{
-  "name": "Taboola New Tab",
-  "version": "1.0",
-  "description": "Taboola New Tab",
-  "manifest_version": 2,
-  "short_name": "New Tab",
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
-  },
-  "icons": { 
-    "16": "img/icon16.png",
+	"name": "New Tab",
+	"version": "1.0",
+	"description": "New Tab",
+	"manifest_version": 2,
+	"short_name": "New Tab",
+	"chrome_url_overrides": {
+	 	"newtab": "newtab.html"
+	},
+	"icons": { 
+		"16": "img/icon16.png",
         "48": "img/icon48.png",
         "128": "img/icon128.png" 
-  },
-  "browser_action": {
-      "default_icon": "img/icon32.png"
-    }
+	},
+	"browser_action": {
+    	"default_icon": "img/icon32.png"
+  	}
 }
 """
 
@@ -115,20 +115,35 @@ css = """div.wall {
 
 .chip {
   font-size: 12px;
-  display: inline-block;
   padding: 0 25px;
   height: 45px;
   line-height: 50px;
   border-radius: 25px;
   background-color: #f1f1f1;
   display: inline-block;
-  margin: 20px;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  position: relative;
 }
 
 .chip:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   background-color: #d3f3ff
+}
+
+.chip-wrapper {
+  font-size: 12px;
+  height: 45px;
+  line-height: 50px;
+  border-radius: 25px;
+  background-color: yellow;
+  display: inline-block;
+  position: relative;
+  margin: 20px;
+  z-index: 110;
+}
+
+.chip-wrapper:hover .dropdown-content {
+  display: block;
 }
 
 .chip img {
@@ -216,15 +231,27 @@ def get_image_name(name,alt_image):
         return None
 
 
-def html_chip(chip_name,url,image_name,**kwargs):
+
+def html_chip(chip_name,url,image_name,dropdown,**kwargs):
     if image_name is None or not image_name:
         img = ''
     else:
-        img =  """<img src="{image_name}">""".format(image_name=image_name)
-    return """<a href="{url}"><div class="chip">{img}{chip_name}</div></a>""".format(chip_name=chip_name,url=url,img=img)
+        img = """<img src="{image_name}">""".format(image_name=image_name)
+    if not url:
+        href = ''
+    else:
+        href = 'href="{url}"'.format(url=url)
+    if dropdown is None or not dropdown:
+        dropdown_html = ''
+    else:
+        dropdown_html = """<div class="dropdown-content" style="top: 45px; line-height: 10px">"""
+        for item in dropdown:
+            dropdown_html += """\n<a class="dropdown-content-item" href="{url}">{name}</a>""".format(name=item[0],url=item[1])
+        dropdown_html += """\n</div>"""
+    return """<div class="chip-wrapper">{dropdown_html}<a {href}><div class="chip">{img}{chip_name}</div></a></div>""".format(chip_name=chip_name,href=href,img=img,dropdown_html=dropdown_html)
 
 
-def html_card(card_name,url,image_name,**kwargs):
+def html_card(card_name,url,image_name,dropdown,**kwargs):
     if card_name is None:
         card_name = '&nbsp;'
         container_additional = 'style="background-color: transparent;"'
@@ -238,15 +265,14 @@ def html_card(card_name,url,image_name,**kwargs):
         z_index = 100-kwargs['i']
     else:
         z_index = 0
-    if url is None:
+    if not url:
         href = ''
     else:
         href = 'href="{url}"'.format(url=url)
-    dropdown = kwargs.get('dropdown', list())
     if dropdown is None or not dropdown:
         dropdown_html = ''
     else:
-        dropdown_html = """\n<div class="dropdown"><img src="img/dropdown.png" class="dropdownarrow"><div class="dropdown-content">"""
+        dropdown_html = """<div class="dropdown"><img src="img/dropdown.png" class="dropdownarrow"><div class="dropdown-content">"""
         for item in dropdown:
             dropdown_html += """\n<a class="dropdown-content-item" href="{url}">{name}</a>""".format(name=item[0],url=item[1])
         dropdown_html += """\n</div></div>"""
@@ -280,13 +306,13 @@ def add_objects_to_file(file,csv_name,row_length,html_func):
                     dropdown.append((row[n], row[n+1]))
                 name = row[0]
                 image_name = get_image_name(name, alt_img)
-                file.write(html_func(name, row[1], image_name, dropdown=dropdown, i=i))
+                file.write(html_func(name, row[1], image_name, dropdown, i=i))
                 if i % row_length == 0 and i > 0:
                     file.write('<br>')
             if csv_name == 'cards.csv' and i % row_length != 0:
                 while i % row_length != 0:
                     i = i + 1
-                    file.write(html_func(None, None, 'img/blank.png'))
+                    file.write(html_func(None, None, 'img/blank.png', []))
                 file.write('<br>')
             if not (i - 1) % row_length == 0:
                 file.write('<br>')
