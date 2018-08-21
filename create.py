@@ -119,15 +119,9 @@ css = """div.wall {
   height: 45px;
   line-height: 50px;
   border-radius: 25px;
-  background-color: #f1f1f1;
+  background-color: transparent;
   display: inline-block;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   position: relative;
-}
-
-.chip:hover {
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  background-color: #d3f3ff
 }
 
 .chip-wrapper {
@@ -135,11 +129,17 @@ css = """div.wall {
   height: 45px;
   line-height: 50px;
   border-radius: 25px;
-  background-color: yellow;
+  background-color: #f1f1f1;
   display: inline-block;
   position: relative;
   margin: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   z-index: 110;
+}
+
+.chip-wrapper:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  background-color: #d3f3ff
 }
 
 .chip-wrapper:hover .dropdown-content {
