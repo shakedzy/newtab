@@ -314,7 +314,7 @@ def add_objects_to_file(file,csv_name,row_length,html_func):
                     i = i + 1
                     file.write(html_func(None, None, 'img/blank.png', []))
                 file.write('<br>')
-            if not (i - 1) % row_length == 0:
+            if not i % row_length == 0:
                 file.write('<br>')
     except FileNotFoundError:
         print("CSV file {file} was not found".format(file=csv_name))
@@ -326,6 +326,6 @@ if __name__ == '__main__':
         f.write(css)
     with open('newtab.html','w') as f:
         f.write(html_start)
-        add_objects_to_file(f,'chips.csv',6,html_chip)
+        add_objects_to_file(f,'chips.csv',8,html_chip)
         add_objects_to_file(f,'cards.csv',4,html_card)
         f.write(html_end)
