@@ -2,6 +2,13 @@
 
 ![screenshot](desc/screenshot.png)
 
+## Pre-requirements:
+Run:
+```
+pip install pyyaml
+```
+(or `pip3` if you use Python 3.x)
+
 ## Installation:
 * Extract all files to any directory
 * In Chrome, go to [`chrome://extensions`](chrome://extensions)
@@ -10,55 +17,62 @@
 
 ## Creating custom tabs:
 Follow the instructions below and use the `create.py` script.
-
-
-**Note:** The script used requires Python 3.x
+This script supports both Python 2.7 and 3.x.
 
 ### Configuring links:
-Two CSV files are used required (you can also have just one): `chips.csv` and 
-`cards.csv`, where Chips are the small links at the top and Cards are the big ones 
+Two YML files are used required: `chips.yml` and 
+`cards.yml`, where Chips are the small links at the top and Cards are the big ones 
 underneath them (see screen-shot above).
 
-Both CSV files have the same syntax: `name,url`. For example:
-``` 
-HBO,http://www.hbo.com
-Netflix,http://www.netflix.com
-``` 
-
-### Additional drop-down links:
-It is possible to add additional links to cards and chips as a drop-down menu.
-To do so, simply add more `name,url` tuples in each line. For example:
-``` 
-HBO,http://www.hbo.com
-Netflix,http://www.netflix.com,Netflix Originals,https://www.netflix.com/il-en/originals
+The syntax is as follows:
 ```
-This second row will create the following card:
+- Site 1 Name: Site URL
+  image: image_name  # all images are found under the "img" directory. This is optional
+  more:              # optional, will add links as a dropdown menu
+  - Extra 1: URL
+  - Extra 2: URL
+  
+- Site 2 Name: Site URL
+  ...
+```
+
+For example, the following `yml` will create the card in the picture:
+```
+- Netflix: "http://www.netflix.com"
+  more:
+  - Netflix Originals: "http://www.netflix.com/originals"
+```
 
 ![dropdown_example](desc/dropdown.png)
 
 ### Configuring images:
 The script automatically look for an image named `img/[name].png`, where `[name]`
-is the name defined in the CSV file (lowered-case and with no spaces, so for `HBO`
+is the name defined in the YML file (lowered-case and with no spaces, so for `HBO`
 it will look for an image named `img/hbo.png` and for `Big Query` it will look
 for `img/bigquery.png`). If no such image is found, then no image will be used for 
 Chips, and a colored square with the first letter will be used for Cards (see the
 rightmost card on the second row in the screen-shot).
 
 **Defining alternative images:** You can specify an alternative image file instead
-of the one looked for by default. To do so, add the image file-name as the _last_
-column in the CSV file. For example, to define an alternative image for `Netflix`:
-``` 
-HBO,http://www.hbo.com
-Netflix,http://www.netflix.com,nfx.jpg
-``` 
-This will make the script use the file `img/nfx.jpg`.
+of the one looked for by default. To do so, add the `image` key to the site on the
+YML file (see example above). All images are assumed to be found in the `img/` 
+directory.
 
-Note that all images are always stored in the `img/` directory.
+### Adding break lines to drop-down menus:
+It is possible to add break-lines to a drop down menu. Simply insert an undescore
+(`_`) as an element of `more`. For example:
+```
+- Netflix: "http://www.netflix.com"
+  more:
+  - Netflix Originals: "http://www.netflix.com/originals"
+  - _
+  - Netflix Careers: "http://www.netflix.com/careers"
+```
 
 ### Running the script:
 Assuming the files were placed in: `~/newtab/`, run:
 ```
 cd ~/newtab
-python3 create.py
+python create.py
 ``` 
-There's no need to reinstall the extension.
+There's no need to reinstall the extension, any changes to the new-tab page will take effect immediately.
