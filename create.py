@@ -12,17 +12,17 @@ manifest = """{
 	},
 	"icons": { 
 		"16": "img/icon16.png",
-        "48": "img/icon48.png",
-        "128": "img/icon128.png" 
+        	"48": "img/icon48.png",
+        	"128": "img/icon128.png" 
 	},
 	"browser_action": {
-    	"default_icon": "img/icon32.png"
+    		"default_icon": "img/icon32.png"
   	}
 }
 """
 
 css = """div.wall {
-  max-width: 1500px;
+  max-width: 1800px;
   font-size: 14px;
 }
 .card {
@@ -30,7 +30,7 @@ css = """div.wall {
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   background: white;
   transition: 0.3s;
-  width: 20%;
+  width: 15%;
   border-radius: 5px;
   height: 90%;
   display: inline-block;
@@ -45,7 +45,7 @@ css = """div.wall {
 
 .cardimg { 
   border-radius: 5px 5px 0 0;
-  max-width: 50%;
+  max-width: 70%;
   height: 100%;
   max-height: 100px;
   padding-bottom: 5px;
@@ -64,7 +64,7 @@ css = """div.wall {
   height: 90px; 
   border-radius: 5px 5px 5px 5px; 
   padding-bottom: 5px; 
-  width: 40%; 
+  width: 45%; 
   font-size: 75px; 
   color: white;
 }
@@ -309,11 +309,12 @@ def get_element_name(element):
         return name[0]
 
 
-def add_chips_to_file(file, row_length):
+def add_chips_to_file(file):
     filename = 'chips.yml'
     try:
         with open(filename, 'r') as yml:
             data = yaml.safe_load(yml)
+            row_length = 8
             i = 0
             for element in data:
                 i = i + 1
@@ -326,15 +327,19 @@ def add_chips_to_file(file, row_length):
                     file.write('<br>')
             if not i % row_length == 0:
                 file.write('<br>')
-    except FileNotFoundError:
-        print("CSV file {file} was not found".format(file=filename))
+    except IOError:
+        print("{file} was not found".format(file=filename))
+    except Exception as e:
+        print('An error occurred while parsing {file}:'.format(file=filename))
+        print(e)
 
 
-def add_cards_to_file(file, row_length):
+def add_cards_to_file(file):
     filename = 'cards.yml'
     try:
         with open(filename, 'r') as yml:
             data = yaml.safe_load(yml)
+            row_length = 4 if len(data) <= 16 else 5
             i = 0
             for element in data:
                 i = i + 1
@@ -352,8 +357,11 @@ def add_cards_to_file(file, row_length):
                 file.write('<br>')
             if not i % row_length == 0:
                 file.write('<br>')
-    except FileNotFoundError:
-        print("CSV file {file} was not found".format(file=filename))
+    except IOError:
+        print("{file} was not found".format(file=filename))
+    except Exception as e:
+        print('An error occurred while parsing {file}:'.format(file=filename))
+        print(e)
 
 
 if __name__ == '__main__':
@@ -363,6 +371,6 @@ if __name__ == '__main__':
         f.write(css)
     with open('newtab.html','w') as f:
         f.write(html_start)
-        add_chips_to_file(f, row_length=8)
-        add_cards_to_file(f, row_length=4)
+        add_chips_to_file(f)
+        add_cards_to_file(f)
         f.write(html_end)
