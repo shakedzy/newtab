@@ -20,11 +20,10 @@ Follow the instructions below and use the `create.py` script.
 This script supports both Python 2.7 and 3.x.
 
 ### Configuring links:
-Two YML files are used required: `chips.yml` and 
-`cards.yml`, where Chips are the small links at the top and Cards are the big ones 
-underneath them (see screen-shot above).
+One YML files are used required: `config.yml`. This file can have two optional sections, `chips` and `cards`,
+where chips are the small links at the top and cards are the big ones underneath them (see screen-shot above).
 
-The syntax is as follows:
+The syntax for both sections is as follows:
 ```
 - Site 1 Name: Site URL
   image: image_name  # all images are found under the "img" directory. This is optional

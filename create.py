@@ -2,22 +2,22 @@ import yaml
 import os.path
 
 manifest = """{
-	"name": "New Tab",
-	"version": "1.0",
-	"description": "New Tab",
-	"manifest_version": 2,
-	"short_name": "New Tab",
-	"chrome_url_overrides": {
-	 	"newtab": "newtab.html"
-	},
-	"icons": { 
-		"16": "img/icon16.png",
-        	"48": "img/icon48.png",
-        	"128": "img/icon128.png" 
-	},
-	"browser_action": {
-    		"default_icon": "img/icon32.png"
-  	}
+  "name": "New Tab",
+  "version": "1.0",
+  "description": "New Tab",
+  "manifest_version": 2,
+  "short_name": "New Tab",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "icons": { 
+    "16": "img/icon16.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png" 
+  },
+  "browser_action": {
+      "default_icon": "img/icon32.png"
+    }
 }
 """
 
@@ -309,68 +309,63 @@ def get_element_name(element):
         return name[0]
 
 
-def add_chips_to_file(file):
-    filename = 'chips.yml'
-    try:
-        with open(filename, 'r') as yml:
-            data = yaml.safe_load(yml)
-            row_length = 8
-            i = 0
-            for element in data:
-                i = i + 1
-                alt_img = element.get('image', None)
-                name = get_element_name(element)
-                image_name = get_image_name(name, alt_img)
-                file.write(html_chip(chip_name=name, url=element[name], image_name=image_name,
-                                     dropdown=element.get('more', None)))
-                if i % row_length == 0 and i > 0:
-                    file.write('<br>')
-            if not i % row_length == 0:
-                file.write('<br>')
-    except IOError:
-        print("{file} was not found".format(file=filename))
-    except Exception as e:
-        print('An error occurred while parsing {file}:'.format(file=filename))
-        print(e)
+def add_chips_to_file(data, file):
+    row_length = 8
+    i = 0
+    for element in data:
+        i = i + 1
+        alt_img = element.get('image', None)
+        name = get_element_name(element)
+        image_name = get_image_name(name, alt_img)
+        file.write(html_chip(chip_name=name, url=element[name], image_name=image_name,
+                             dropdown=element.get('more', None)))
+        if i % row_length == 0 and i > 0:
+            file.write('<br>')
+    if not i % row_length == 0:
+        file.write('<br>')
 
 
-def add_cards_to_file(file):
-    filename = 'cards.yml'
-    try:
-        with open(filename, 'r') as yml:
-            data = yaml.safe_load(yml)
-            row_length = 4 if len(data) <= 16 else 5
-            i = 0
-            for element in data:
-                i = i + 1
-                alt_img = element.get('image', None)
-                name = get_element_name(element)
-                image_name = get_image_name(name, alt_img)
-                file.write(html_card(card_name=name, url=element[name], image_name=image_name,
-                                     dropdown=element.get('more', None), idx=i))
-                if i % row_length == 0 and i > 0:
-                    file.write('<br>')
-            if i % row_length != 0:
-                while i % row_length != 0:
-                    i = i + 1
-                    file.write(html_card(None, None, 'img/blank.png', {}, idx=None))
-                file.write('<br>')
-            if not i % row_length == 0:
-                file.write('<br>')
-    except IOError:
-        print("{file} was not found".format(file=filename))
-    except Exception as e:
-        print('An error occurred while parsing {file}:'.format(file=filename))
-        print(e)
+def add_cards_to_file(data, file):
+    row_length = 4 if len(data) <= 16 else 5
+    i = 0
+    for element in data:
+        i = i + 1
+        alt_img = element.get('image', None)
+        name = get_element_name(element)
+        image_name = get_image_name(name, alt_img)
+        file.write(html_card(card_name=name, url=element[name], image_name=image_name,
+                             dropdown=element.get('more', None), idx=i))
+        if i % row_length == 0 and i > 0:
+            file.write('<br>')
+    if i % row_length != 0:
+        while i % row_length != 0:
+            i = i + 1
+            file.write(html_card(None, None, 'img/blank.png', {}, idx=None))
+        file.write('<br>')
+    if not i % row_length == 0:
+        file.write('<br>')
 
 
 if __name__ == '__main__':
-    with open('manifest.json','w') as f:
-        f.write(manifest)
-    with open('style.css','w') as f:
-        f.write(css)
-    with open('newtab.html','w') as f:
-        f.write(html_start)
-        add_chips_to_file(f)
-        add_cards_to_file(f)
-        f.write(html_end)
+    filename = "config.yml"
+    try:
+        with open(filename, 'r') as yml:
+            data = yaml.safe_load(yml)
+            with open('manifest.json','w') as f:
+                f.write(manifest)
+            with open('style.css','w') as f:
+                f.write(css)
+            with open('newtab.html','w') as f:
+                f.write(html_start)
+                chips = data.get('chips', None)
+                if chips is not None: 
+                  add_chips_to_file(chips, f)
+                cards = data.get('cards', None)
+                if cards is not None:
+                  add_cards_to_file(cards, f)
+                f.write(html_end)
+    except IOError:
+        print("{file} was not found".format(file=filename))
+    except Exception as e:
+        print('An error occurred while parsing {file}:'.format(file=filename))
+        print(e)
