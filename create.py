@@ -40,7 +40,7 @@ css = """div.wall {
 
 .card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  background-color: #d3f3ff
+  background-color: #hover_color#;
 }
 
 .cardimg { 
@@ -138,7 +138,7 @@ css = """div.wall {
 
 .chip-wrapper:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-  background-color: #d3f3ff
+  background-color: #hover_color#;
 }
 
 .chip-wrapper:hover .dropdown-content {
@@ -200,10 +200,10 @@ html_start = """<!DOCTYPE html>
   <link rel="stylesheet" href="style.css">
 </head>
 <body><center>
-  <div style="padding-top:20px; padding-bottom:5px; background:#229dcc" align="center">
+  <div style="padding-top:20px; padding-bottom:5px; background: {header_color}" align="center">
     <img src="img/header.png">
   </div>
-  <div style="background:linear-gradient(to bottom, #229dcc , white); height:20px"></div>
+  <div style="background:linear-gradient(to bottom, {header_color} , white); height:20px"></div>
   <div style="background-color: white; height:10px"></div>
   <div class="wall">"""
 
@@ -309,8 +309,7 @@ def get_element_name(element):
         return name[0]
 
 
-def add_chips_to_file(data, file):
-    row_length = 8
+def add_chips_to_file(data, file, row_length):
     i = 0
     for element in data:
         i = i + 1
@@ -325,8 +324,7 @@ def add_chips_to_file(data, file):
         file.write('<br>')
 
 
-def add_cards_to_file(data, file):
-    row_length = 4 if len(data) <= 16 else 5
+def add_cards_to_file(data, file, row_length):
     i = 0
     for element in data:
         i = i + 1
@@ -345,27 +343,31 @@ def add_cards_to_file(data, file):
     if not i % row_length == 0:
         file.write('<br>')
 
-
 if __name__ == '__main__':
     filename = "config.yml"
     try:
         with open(filename, 'r') as yml:
             data = yaml.safe_load(yml)
+            config = data.get('config', dict())
             with open('manifest.json','w') as f:
                 f.write(manifest)
             with open('style.css','w') as f:
-                f.write(css)
+                hover_color = config.get('highlight', '#d3f3ff')
+                f.write(css.replace("#hover_color#", hover_color))
             with open('newtab.html','w') as f:
-                f.write(html_start)
+                header_color = config.get('header', '#229dcc')
+                chips_per_row = config.get('chips_per_row', 8)
+                cards_per_row = config.get('cards_per_row', 5)
+                f.write(html_start.format(header_color=header_color))
                 chips = data.get('chips', None)
                 if chips is not None: 
-                  add_chips_to_file(chips, f)
+                  add_chips_to_file(chips, f, chips_per_row)
                 cards = data.get('cards', None)
                 if cards is not None:
-                  add_cards_to_file(cards, f)
+                  add_cards_to_file(cards, f, cards_per_row)
                 f.write(html_end)
     except IOError:
         print("{file} was not found".format(file=filename))
-    except Exception as e:
-        print('An error occurred while parsing {file}:'.format(file=filename))
-        print(e)
+    # except Exception as e:
+    #     print('An error occurred while parsing {file}:'.format(file=filename))
+    #     print()
